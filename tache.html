@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture — JASON INVEST</title>
+<style>
+:root{--bg:#050912;--surface:#0d1727;--gold:#d8b45a;--gold-light:#f1d98b;--text:#f4f7fb;--muted:#8997aa;--border:rgba(255,255,255,.09);--green:#37d67a;}
+*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Georgia, serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:#08111f;border-right:1px solid var(--border);padding:22px 16px;z-index:1000;transition:.25s;}
+.logo{text-align:center;padding:10px 5px 25px;border-bottom:1px solid var(--border);margin-bottom:18px;}
+.logo-icon{width:58px;height:58px;margin:auto;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#182b46,#0c1627);border:1px solid rgba(216,180,90,.35);color:var(--gold-light);font-size:26px;font-weight:900;}
+.nav{display:flex;flex-direction:column;gap:7px;}.nav a{display:flex;gap:11px;text-decoration:none;color:#c9d2df;padding:12px 13px;border-radius:12px;font-family:Arial,sans-serif;font-size:14px;}
+.nav a.active{background:rgba(216,180,90,.12);color:var(--gold-light);}
+.main{margin-left:260px;min-height:100vh;}.topbar{height:70px;display:flex;align-items:center;justify-content:space-between;padding:0 30px;border-bottom:1px solid var(--border);background:rgba(5,9,18,.85);position:sticky;top:0;z-index:500;font-family:Arial,sans-serif;}
+.balance-mini{background:var(--surface);border:1px solid var(--border);padding:9px 13px;border-radius:12px;font-size:13px;}.balance-mini strong{color:var(--gold-light);}
+.menu-btn{display:none;border:1px solid var(--border);background:var(--surface);color:white;width:42px;height:42px;border-radius:12px;}
+.content{padding:30px;max-width:900px;margin:auto;}
+.book-card{background:linear-gradient(145deg,rgba(216,180,90,.06),transparent 50%),var(--surface);border:1px solid rgba(216,180,90,.18);border-radius:24px;padding:32px;box-shadow:0 20px 50px rgba(0,0,0,.3);}
+.book-header{text-align:center;margin-bottom:25px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.book-title{font-size:26px;color:var(--gold-light);margin-bottom:6px;}.book-author{color:var(--muted);font-size:13px;font-family:Arial,sans-serif;}
+.book-content{line-height:1.9;font-size:16px;color:#e8edf3;max-height:400px;overflow-y:auto;padding:20px;background:#091321;border-radius:14px;border:1px solid var(--border);text-align:justify;}
+.timer-box{text-align:center;margin:25px 0;}
+.timer{font-size:56px;font-weight:900;color:var(--gold-light);letter-spacing:3px;font-family:Arial,sans-serif;}
+.progress{width:100%;max-width:600px;height:10px;margin:12px auto 20px;background:#08111d;border-radius:20px;overflow:hidden;border:1px solid var(--border);}
+.progress-bar{width:0%;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));transition:width 1s linear;}
+.start-btn{width:100%;max-width:420px;border:0;border-radius:14px;padding:16px 20px;background:linear-gradient(135deg,#d8b45a,#f1d98b);color:#111;font-weight:900;font-size:16px;font-family:Arial,sans-serif;display:block;margin:0 auto;}
+.start-btn:disabled{opacity:.4;cursor:not-allowed;}
+.status{margin:18px auto 0;max-width:650px;padding:13px 15px;border-radius:12px;font-size:13px;font-family:Arial,sans-serif;display:none;text-align:center;}.status.show{display:block;}.status.success{background:rgba(55,214,122,.08);border:1px solid rgba(55,214,122,.2);color:#79eaa5;}
+@media(max-width:900px){.sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}.main{margin-left:0;}.menu-btn{display:block;}.content{padding:20px 15px;}.book-content{max-height:300px;font-size:15px;}.book-card{padding:20px;}}
+</style>
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+<div class="logo"><div class="logo-icon">📖</div><h1 style="font-family:Arial,sans-serif;font-size:19px;margin-top:12px;">JASON INVEST</h1><p style="font-family:Arial,sans-serif;color:#8997aa;font-size:11px;margin-top:5px;">Lecture quotidienne</p></div>
+<nav class="nav">
+<a href="dashboard.html">🏠 Dashboard</a>
+<a href="investissement.html">📈 Investir</a>
+<a href="tache.html" class="active">📖 Livre du jour</a>
+<a href="historique.html">🧾 Historique</a>
+</nav>
+</aside>
+<main class="main">
+<header class="topbar"><div style="display:flex;gap:12px;align-items:center;"><button class="menu-btn" id="menuBtn">☰</button><div style="font-weight:800;">Livre du jour - Jason Aloma</div></div><div class="balance-mini">Solde: <strong id="topBalance">0 FC</strong></div></header>
+<section class="content">
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;font-family:Arial,sans-serif;">
+<div style="background:#0d1727;border:1px solid rgba(255,255,255,.09);padding:14px;border-radius:12px;"><span style="display:block;color:#8997aa;font-size:11px;margin-bottom:6px;">Solde</span><strong id="balance">0 FC</strong></div>
+<div style="background:#0d1727;border:1px solid rgba(255,255,255,.09);padding:14px;border-radius:12px;"><span style="display:block;color:#8997aa;font-size:11px;margin-bottom:6px;">Gain aujourd'hui</span><strong id="todayGain" style="color:#f1d98b;">0 FC</strong></div>
+<div style="background:#0d1727;border:1px solid rgba(255,255,255,.09);padding:14px;border-radius:12px;"><span style="display:block;color:#8997aa;font-size:11px;margin-bottom:6px;">Jour</span><strong id="progress">0/30</strong></div>
+</div>
+
+<div class="book-card">
+<div class="book-header">
+<div class="book-title" id="bookTitle">Chargement...</div>
+<div class="book-author">Par Jason Aloma - Lecture obligatoire 5 minutes</div>
+</div>
+<div class="book-content" id="bookContent">
+Chargement du livre...
+</div>
+
+<div class="timer-box">
+<div class="timer" id="timer">05:00</div>
+<div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+<button class="start-btn" id="startBtn">📖 Commencer la lecture (5 min)</button>
+<div class="status" id="status"></div>
+<div style="margin-top:12px;font-family:Arial,sans-serif;color:#8997aa;font-size:11px;">Lis le livre ci-dessus pendant 5 minutes sans quitter la page. Ton compte sera crédité automatiquement.</div>
+</div>
+</div>
+
+<div style="margin-top:20px;background:#0d1727;border:1px solid rgba(255,255,255,.09);border-radius:20px;padding:20px;font-family:Arial,sans-serif;">
+<h3>📅 Mes lectures</h3><div id="taskHistory" style="margin-top:15px;"></div>
+</div>
+</section>
+</main>
+<script>
+const TASK_TIME=5*60;
+function money(v){return Number(v||0).toLocaleString('fr-FR')+" FC";}
+function getCurrent(){try{return JSON.parse(localStorage.getItem('jason_current')||'null');}catch{return null;}}
+function getUsers(){return JSON.parse(localStorage.getItem('jason_users')||'[]');}
+function saveUsers(u){localStorage.setItem('jason_users',JSON.stringify(u));}
+function todayKey(){return new Date().toISOString().slice(0,10);}
+function showStatus(m,t){const s=document.getElementById("status"); s.textContent=m; s.className="status show "+t;}
+
+const livresJasonAloma=[
+  {
+    titre: "Jour 1 - L'Art de l'Investissement",
+    contenu: `Chapitre 1: La patience est la clé de la richesse.
+
+Beaucoup de gens veulent devenir riches rapidement. Mais la vraie richesse se construit avec le temps, comme un arbre qui pousse. Quand tu plantes une graine, tu ne récoltes pas le lendemain. Tu dois arroser chaque jour, pendant des mois, parfois des années.
+
+C'est exactement pareil avec l'investissement. Tu investis 20 000 FC aujourd'hui. Ce n'est pas beaucoup. Mais si tu fais ta tâche chaque jour, si tu es patient pendant 30 jours, tu récoltes 45 000 FC. C'est plus que le double.
+
+Jason Aloma dit souvent: "Le pauvre cherche l'argent rapide. Le riche cherche le système qui paie chaque jour."
+
+Aujourd'hui, tu as fait le bon choix. Tu es dans un système. Respecte le système. Lis chaque jour. Fais ta tâche. Ne saute pas un jour. La régularité bat l'intelligence.
+
+Souviens-toi: 1 500 FC par jour pendant 30 jours, c'est 45 000 FC. C'est le début de ta liberté financière.`
+  },
+  {
+    titre: "Jour 2 - Pourquoi 5 Minutes Peuvent Changer Ta Vie",
+    contenu: `Chapitre 2: Le pouvoir des 5 minutes.
+
+Tu te demandes pourquoi 5 minutes? Pourquoi pas 1 minute ou 1 heure?
+
+Jason Aloma a étudié les millionnaires de Kinshasa. Il a remarqué une chose: ils lisent tous au moins 5 minutes par jour. Pas 1 heure. 5 minutes.
+
+Pourquoi? Parce que 5 minutes, tout le monde peut le faire. C'est court, mais c'est suffisant pour changer ton cerveau. En 5 minutes, tu peux apprendre une idée qui te fait gagner 1 500 FC aujourd'hui, et des millions demain.
+
+La lecture n'est pas une perte de temps. C'est un investissement. Quand tu lis ce livre pendant 5 minutes, tu n'es pas seulement en train de gagner 1 500 FC. Tu es en train de former ton esprit à penser comme un investisseur.
+
+Les pauvres scrollent TikTok 5 heures. Les riches lisent 5 minutes et gagnent. Choisis ton camp.
+
+Aujourd'hui, lis bien. Demain, tu seras plus intelligent qu'hier.`
+  },
+  {
+    titre: "Jour 3 - Le Secret du Renouvellement",
+    contenu: `Chapitre 3: Pourquoi renouveler?
+
+Beaucoup abandonnent après 30 jours. Ils disent "j'ai gagné, je m'arrête". C'est l'erreur la plus grave.
+
+Jason Aloma enseigne: l'argent doit tourner. Si tu as investi 20 000 et gagné 45 000, tu as 25 000 de bénéfice. Si tu retires tout, tu redeviens pauvre. Si tu réinvestis 20 000, tu recommences à gagner 1 500 par jour.
+
+C'est comme un champ. Tu récoltes le maïs, tu manges une partie, mais tu gardes des graines pour replanter. Si tu manges toutes les graines, l'année prochaine tu n'as rien.
+
+Donc après 30 jours, quand ton plan expire, ne pleure pas. Célèbre! Tu as fini un cycle. Maintenant, renouvelle. Et cette fois, peut-être passe à 50 000 FC pour gagner 4 000 FC par jour.
+
+Les riches ne s'arrêtent jamais. Ils renouvellent. Ils augmentent. C'est ça, le secret.`
+  }
+];
+
+function getTodayBook(){
+  const day=new Date().getDate();
+  return livresJasonAloma[day % livresJasonAloma.length];
+}
+
+let timerInterval=null, remaining=TASK_TIME, running=false;
+
+function loadBook(){
+  const cur=getCurrent(); if(!cur){location.href="index.html";return;}
+  const invs=JSON.parse(localStorage.getItem('jason_investments')||'[]').filter(i=>i.userId===cur.id && i.status==="active");
+  const lastInv=invs.length? invs[invs.length-1] : null;
+
+  document.getElementById("balance").textContent=money(cur.solde||0);
+  document.getElementById("topBalance").textContent=money(cur.solde||0);
+
+  if(!lastInv){
+    document.getElementById("bookTitle").textContent="Investis pour débloquer le livre";
+    document.getElementById("bookContent").textContent="Tu dois investir minimum 20 000 FC (max 5 000 000 FC) pour lire le livre quotidien de Jason Aloma et gagner chaque jour. Va dans Investissement.";
+    document.getElementById("todayGain").textContent="0 FC";
+    document.getElementById("progress").textContent="0/30";
+    document.getElementById("startBtn").disabled=true;
+    document.getElementById("startBtn").textContent="Investis d'abord";
+    renderHistory([]);
+    return;
+  }
+
+  const book=getTodayBook();
+  const daily=Number(lastInv.dailyGain||0);
+  const duration=Number(lastInv.duration||30);
+  const doneList=JSON.parse(localStorage.getItem('jason_tasks_done')||'[]').filter(t=>t.userId===cur.id && t.investmentId===lastInv.id);
+  const doneCount=doneList.length;
+
+  document.getElementById("bookTitle").textContent=book.titre + ` - ${lastInv.plan}`;
+  document.getElementById("bookContent").textContent=book.contenu;
+  document.getElementById("todayGain").textContent=money(daily);
+  document.getElementById("progress").textContent=`${doneCount}/${duration}`;
+
+  if(doneCount>=duration){
+    document.getElementById("bookTitle").textContent=`🏆 ${lastInv.plan} terminé - Bravo!`;
+    document.getElementById("bookContent").textContent=`Félicitations! Tu as lu ${duration} jours le livre de Jason Aloma. Tu as gagné ${money(daily*duration)}. Maintenant renouvelle ton investissement pour continuer à lire et gagner. Le savoir n'a pas de fin.`;
+    document.getElementById("startBtn").textContent="🔄 Renouveler pour continuer à lire";
+    document.getElementById("startBtn").disabled=false;
+    document.getElementById("startBtn").onclick=()=>location.href="investissement.html";
+    showStatus(`Plan terminé. ${money(daily*duration)} gagné en lisant. Renouvelle.`, "success");
+    renderHistory(doneList);
+    return;
+  }
+
+  const todayDone=doneList.find(t=>t.dateKey===todayKey());
+  if(todayDone){
+    document.getElementById("startBtn").disabled=true;
+    document.getElementById("startBtn").textContent=`✅ Lu aujourd'hui +${money(todayDone.reward)}`;
+    document.getElementById("timer").textContent="00:00";
+    document.getElementById("progressBar").style.width="100%";
+    showStatus(`Lecture du jour ${doneCount}/${duration} déjà faite. Reviens demain.`, "success");
+  }else{
+    document.getElementById("startBtn").disabled=false;
+    document.getElementById("startBtn").textContent=`📖 Lire 5 min et gagner ${money(daily)}`;
+    document.getElementById("startBtn").onclick=startReading;
+    document.getElementById("timer").textContent="05:00";
+    document.getElementById("progressBar").style.width="0%";
+  }
+  renderHistory(doneList);
+}
+
+function startReading(){
+  if(running) return;
+  running=true; remaining=TASK_TIME;
+  const btn=document.getElementById("startBtn"); btn.disabled=true;
+  showStatus("Lecture en cours... Lis le livre ci-dessus pendant 5 minutes. Ne quitte pas la page.", "success");
+  function update(){
+    const m=String(Math.floor(remaining/60)).padStart(2,"0");
+    const s=String(remaining%60).padStart(2,"0");
+    document.getElementById("timer").textContent=`${m}:${s}`;
+    document.getElementById("progressBar").style.width=((TASK_TIME-remaining)/TASK_TIME*100)+"%";
+    btn.textContent=`⏳ Lecture... ${m}:${s}`;
+  }
+  update();
+  timerInterval=setInterval(()=>{
+    remaining--; update();
+    if(remaining<=0){ clearInterval(timerInterval); finishReading(); }
+  },1000);
+}
+
+function finishReading(){
+  const cur=getCurrent();
+  const lastInv=JSON.parse(localStorage.getItem('jason_investments')||'[]').filter(i=>i.userId===cur.id && i.status==="active").pop();
+  const daily=Number(lastInv.dailyGain||0);
+  let users=getUsers(); const u=users.find(x=>x.id===cur.id);
+  u.solde+=daily;
+  saveUsers(users); cur.solde=u.solde; localStorage.setItem('jason_current',JSON.stringify(cur));
+  const done=JSON.parse(localStorage.getItem('jason_tasks_done')||'[]');
+  done.push({userId:cur.id, investmentId:lastInv.id, plan:lastInv.plan, reward:daily, book:getTodayBook().titre, date:new Date().toISOString(), dateKey:todayKey()});
+  localStorage.setItem('jason_tasks_done',JSON.stringify(done));
+  document.getElementById("balance").textContent=money(cur.solde||0);
+  document.getElementById("topBalance").textContent=money(cur.solde||0);
+  showStatus(`✅ Bravo! Tu as lu 5 minutes. +${money(daily)} crédité automatiquement.`, "success");
+  document.getElementById("startBtn").textContent=`✅ +${money(daily)} gagné`;
+  loadBook();
+}
+
+function renderHistory(list){
+  const div=document.getElementById("taskHistory");
+  if(!list.length){div.innerHTML='<div style="padding:15px;text-align:center;color:#8997aa;font-family:Arial;">Aucune lecture encore</div>'; return;}
+  div.innerHTML=list.slice().reverse().map(h=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:15px;background:#091321;border:1px solid rgba(255,255,255,.09);padding:14px;border-radius:13px;margin-bottom:10px;font-family:Arial;"><div><strong style="font-family:Georgia;">${h.book||h.plan}</strong><div style="font-size:11px;color:#8997aa;">${new Date(h.date).toLocaleString('fr-FR')}</div></div><div style="text-align:right;"><strong style="color:#37d67a;">+${money(h.reward)}</strong></div></div>`).join("");
+}
+
+document.getElementById("menuBtn").addEventListener("click",()=>document.getElementById("sidebar").classList.toggle("open"));
+loadBook();
+</script>
+</body>
+</html>

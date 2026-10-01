@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profil — JASON INVEST</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{--bg:#050912;--gold:#d8b45a;--gold-light:#f3dc91;--text:#f5f7fb;--muted:#8d9bb0;--green:#32d583;}
+*{box-sizing:border-box;margin:0;padding:0;}body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#030711,#07101e);color:var(--text);min-height:100vh;}
+.top{height:58px;display:flex;align-items:center;gap:12px;padding:0 16px;background:rgba(5,11,22,.9);border-bottom:1px solid rgba(255,255,255,.07);position:sticky;top:0;}
+.back{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#fff;text-decoration:none;}
+.wrap{max-width:520px;margin:0 auto;padding:18px;}
+.hero{display:flex;gap:14px;align-items:center;padding:18px;border-radius:18px;background:rgba(9,17,30,.9);border:1px solid rgba(255,255,255,.07);margin-top:10px;}
+.avatar{width:68px;height:68px;border-radius:50%;background:#12223a;border:3px solid rgba(216,180,90,.45);display:flex;align-items:center;justify-content:center;color:var(--gold-light);font-weight:900;font-size:28px;flex-shrink:0;}
+.card{margin-top:14px;padding:18px;border-radius:16px;background:rgba(9,17,30,.9);border:1px solid rgba(255,255,255,.07);}
+.row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);}.row:last-child{border:0;}
+.row span{color:var(--muted);font-size:12px;}.row strong{font-size:13px;word-break:break-all;}
+.input{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(216,180,90,.18);background:#0a1424;color:#fff;margin-top:6px;outline:none;}
+.btn{width:100%;padding:13px;border-radius:11px;border:0;background:linear-gradient(135deg,var(--gold-light),var(--gold));color:#111;font-weight:800;cursor:pointer;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="top"><a href="dashboard.html" class="back"><i class="fa-solid fa-arrow-left"></i></a><div><strong>Mon Profil</strong><div style="font-size:10px;color:var(--muted);">JASON INVEST</div></div></div>
+
+<div class="wrap">
+<div class="hero">
+<div class="avatar" id="avatar">J</div>
+<div><h2 id="nameDisplay" style="font-size:18px;">...</h2><p id="phoneDisplay" style="font-size:13px;color:var(--gold-light);margin-top:3px;">...</p><p id="emailDisplay" style="font-size:11px;color:var(--muted);margin-top:2px;">...</p></div>
+</div>
+
+<div class="card" id="infos">
+<div class="row"><span>Nom complet</span><strong id="infoName">...</strong></div>
+<div class="row"><span>Numéro / Téléphone</span><strong id="infoPhone">...</strong></div>
+<div class="row"><span>Email</span><strong id="infoEmail">...</strong></div>
+<div class="row"><span>Solde</span><strong id="infoSolde" style="color:var(--gold-light);">...</strong></div>
+<div class="row"><span>Code parrainage auto</span><strong id="infoCode" style="color:var(--gold-light);">...</strong></div>
+</div>
+
+<div class="card">
+<h3 style="font-size:14px;margin-bottom:10px;"><i class="fa-solid fa-pen"></i> Corriger mon nom et numéro</h3>
+<p style="font-size:11px;color:var(--muted);line-height:1.5;">Si ton nom et numéro ne s'affichent pas, corrige ici et ça va s'enregistrer automatiquement.</p>
+<input class="input" id="editName" placeholder="Ton nom complet">
+<input class="input" id="editPhone" placeholder="Ton numéro ex: +243...">
+<input class="input" id="editEmail" placeholder="Ton email">
+<button class="btn" onclick="saveProfile()">💾 Enregistrer - corrige l'affichage</button>
+<div id="msg" style="font-size:12px;text-align:center;margin-top:10px;color:var(--green);"></div>
+</div>
+
+<div class="card" style="padding:12px;">
+<p style="font-size:10px;color:var(--muted);line-height:1.6;" id="debug"></p>
+</div>
+</div>
+
+<script>
+function money(v){return Number(v||0).toLocaleString('fr-FR')+" FC";}
+function getCur(){
+  try{
+    let cur = JSON.parse(localStorage.getItem('jason_current')||'null');
+    if(!cur){
+      let users = JSON.parse(localStorage.getItem('jason_users')||'[]');
+      if(users.length>0) cur = users[0];
+    }
+    return cur;
+  }catch{return null;}
+}
+function getUsers(){try{return JSON.parse(localStorage.getItem('jason_users')||'[]');}catch{return [];}}
+
+// Fonction qui trouve nom et numéro peu importe comment il a été enregistré
+function extractName(obj){
+  return obj.name || obj.nom || obj.fullName || obj.username || obj.userName || obj.displayName || '';
+}
+function extractPhone(obj){
+  return obj.phone || obj.telephone || obj.numero || obj.num || obj.tel || obj.mobile || obj.whatsapp || '';
+}
+function extractEmail(obj){
+  return obj.email || obj.mail || '';
+}
+
+function load(){
+  const cur = getCur();
+  const debug = document.getElementById('debug');
+  debug.innerHTML = `Protocole: ${location.protocol}<br>Path: ${location.pathname.split('/').pop()}<br>jason_current: ${localStorage.getItem('jason_current')? 'OUI' : 'NON'}<br>jason_users: ${getUsers().length} user(s)<br>`;
+
+  let myCode = localStorage.getItem('jason_my_referral_code') || 'JAS-'+Math.random().toString(36).substring(2,6).toUpperCase();
+  localStorage.setItem('jason_my_referral_code', myCode);
+
+  if(!cur){
+    document.getElementById('nameDisplay').textContent = 'Aucun compte trouvé';
+    document.getElementById('phoneDisplay').textContent = 'Ouvre dashboard.html d\'abord';
+    document.getElementById('infoName').textContent = '—';
+    document.getElementById('infoPhone').textContent = '—';
+    debug.innerHTML += '<br><b style="color:#ff9aa5;">⚠️ Pas de compte - va sur dashboard.html</b>';
+    return;
+  }
+
+  const name = extractName(cur) || 'Utilisateur';
+  const phone = extractPhone(cur) || 'Numéro non enregistré';
+  const email = extractEmail(cur) || '';
+
+  document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('nameDisplay').textContent = name;
+  document.getElementById('phoneDisplay').textContent = phone;
+  document.getElementById('emailDisplay').textContent = email;
+
+  document.getElementById('infoName').textContent = name;
+  document.getElementById('infoPhone').textContent = phone;
+  document.getElementById('infoEmail').textContent = email || '—';
+  document.getElementById('infoSolde').textContent = money(cur.solde||0);
+  document.getElementById('infoCode').textContent = myCode;
+
+  document.getElementById('editName').value = extractName(cur);
+  document.getElementById('editPhone').value = extractPhone(cur);
+  document.getElementById('editEmail').value = email;
+
+  debug.innerHTML += `<br>Données lues: name="${name}" phone="${phone}"`;
+  if(!extractName(cur) ||!extractPhone(cur)){
+    debug.innerHTML += `<br><b style="color:#ffd36a;">→ Ton compte n'a pas nom/tel → corrige en bas</b>`;
+  }
+}
+
+function saveProfile(){
+  let cur = getCur();
+  if(!cur){ alert('Pas de compte'); return; }
+  let users = getUsers();
+  let idx = users.findIndex(u=>u.id===cur.id);
+  if(idx===-1) idx=0;
+
+  const newName = document.getElementById('editName').value.trim();
+  const newPhone = document.getElementById('editPhone').value.trim();
+  const newEmail = document.getElementById('editEmail').value.trim();
+
+  // On met à jour avec tous les noms possibles pour que ça marche partout
+  cur.name = newName; cur.nom = newName; cur.username = newName;
+  cur.phone = newPhone; cur.telephone = newPhone; cur.numero = newPhone; cur.tel = newPhone;
+  cur.email = newEmail;
+
+  if(users[idx]){
+    users[idx] = {...users[idx],...cur};
+  }else{
+    users.push(cur);
+  }
+
+  localStorage.setItem('jason_users', JSON.stringify(users));
+  localStorage.setItem('jason_current', JSON.stringify(cur));
+
+  document.getElementById('msg').textContent = '✅ Enregistré! Nom et numéro vont s\'afficher maintenant';
+  load();
+  setTimeout(()=>location.reload(),800);
+}
+
+document.addEventListener('DOMContentLoaded', load);
+</script>
+</body>
+</html>
